@@ -1,0 +1,43 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: my-eks-201
+  region: us-east-1
+
+vpc: # Refer: https://github.com/weaveworks/eksctl/blob/main/examples/04-existing-vpc.yaml
+  id: "vpc-0a772db92595ca352"
+  subnets:
+    public:
+      my-public-201-a:
+        id: "subnet-02b3abf1cc5b26a10"
+        az: "us-east-1a"
+      my-public-201-b:
+        id: "subnet-09635e79b2b35aa8f"
+        az: "us-east-1b"
+    private:
+      my-private-201-a:
+        id: "subnet-0ae3632db4b533916"
+        az: "us-east-1a"
+      my-private-201-b:
+        id: "subnet-0bf21be6385bcd0ef"
+        az: "us-east-1b"
+nodeGroups:
+  - name: ng-1-workers
+    labels: { role: workers }
+    instancesDistribution:
+      instanceTypes: 
+        - t2.medium
+    desiredCapacity: 1
+    minSize: 0
+    maxSize: 5
+    privateNetworking: true
+    subnets:
+      - my-private-201-a
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/my-eks-201: "shared"
+    taints:
+      - key: "app"
+        value: "upg-loadme"
+        effect: "NoSchedule"
