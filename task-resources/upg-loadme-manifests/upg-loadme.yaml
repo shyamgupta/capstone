@@ -1,0 +1,57 @@
+---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: upg-loadme
+  namespace: demo
+  labels:
+    app: upg-loadme
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: upg-loadme
+  template:
+    metadata:
+      name: upg-loadme
+      labels:
+        app: upg-loadme
+    spec:
+      tolerations:
+        - key: "app"
+          operator: "Equal"
+          value: "upg-loadme"
+          effect: "NoSchedule"
+      containers:
+        - name: upg-loadme
+          # update image id (manual or via jenkins)
+          image: '690834645538.dkr.ecr.us-east-1.amazonaws.com/ugcapstone'
+          # limiting cpu & mem usage of a pod
+          resources:
+            requests:
+              cpu: 200m
+              memory: 200Mi
+            limits:
+              cpu: 500m
+              memory: 410Mi
+          imagePullPolicy: Always
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 10
+      dnsPolicy: ClusterFirst
+      # add tolerations to restrict running on selected nodes
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: upg-loadme
+  namespace: demo
+spec:
+  selector:
+    app: upg-loadme
+  type: LoadBalancer
+  ports:
+  - name: app-port
+    protocol: TCP
+    port: 80
+    targetPort: 8081

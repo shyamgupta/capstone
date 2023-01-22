@@ -1,0 +1,19 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: EKSTestDrive
+  region: us-east-1
+
+vpc:
+  id: vpc-060eec4e859339013
+  subnets:
+    public:
+      us-east-1a:
+        id: subnet-0b9517ad594a4ecbd
+      us-east-1b:
+        id: subnet-051c017afcf12b74d
+
+nodeGroups:
+  - name: ng-1-workers
+    instanceType: t2.medium
+    desiredCapacity: 2
